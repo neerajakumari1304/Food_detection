@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Model Food Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Multi-Model Food Image Classification System</h2>
+    <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+</div>
+
+<div class="container">
+
+    <!-- ================= SIDEBAR ================= -->
+    <div class="sidebar">
+
+        <div class="profile">
+            <img src="{{ url_for('static', filename='mine.jpg') }}">
+            <h3>Neeraja Kumari Raulo</h3>
+            <p>AI & ML Engineer</p>
+        </div>
+
+        <!-- Skills -->
+        <div class="skills">
+            <h4>Skills</h4>
+            <ul>
+                <li>Python</li>
+                <li>Machine Learning</li>
+                <li>Deep Learning</li>
+                <li>Flask</li>
+                <li>TensorFlow</li>
+                <li>Computer Vision</li>
+                <li>Redis</li>
+                <li>Data Analysis</li>
+            </ul>
+        </div>
+
+        <!-- Class Selection -->
+        <h4 style="margin-top:20px;">Select Class</h4>
+        <select id="classSelect">
+            {% for cls in classes %}
+            <option>{{ cls }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Nutrition -->
+        <div class="nutrition-card">
+            <h4>Nutrition Details</h4>
+            <div id="nutritionData">
+                Upload image to see nutrition information
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= MAIN CENTER ================= -->
+    <div class="main">
+
+        <div class="image-section">
+            <div class="image-card">
+                <h4>Selected Image</h4>
+                <img id="selectedImage">
+            </div>
+
+            <div class="image-card">
+                <h4>Predicted Image</h4>
+                <img id="predictedImage">
+            </div>
+        </div>
+
+        <input type="file" id="imageInput">
+
+        <div class="buttons">
+            <button onclick="predict('custom')">Predict (Custom)</button>
+            <button onclick="predict('resnet')">Predict (ResNet)</button>
+            <button onclick="predict('vgg')">Predict (VGG)</button>
+        </div>
+
+    </div>
+
+    <!-- ================= RIGHT DETAILS ================= -->
+    <div class="details">
+
+        <h3>Prediction & Model Details</h3>
+
+        <p><b>Predicted Class:</b> <span id="predClass">-</span></p>
+        <p><b>Selected Class:</b> <span id="selClass">-</span></p>
+        <p><b>Model Used:</b> <span id="modelUsed">-</span></p>
+        <p><b>Confidence:</b> <span id="confidence">-</span></p>
+        <p><b>Accuracy:</b> <span id="accuracy">-</span></p>
+        <p><b>Precision:</b> <span id="precision">-</span></p>
+        <p><b>Recall:</b> <span id="recall">-</span></p>
+        <p><b>F1 Score:</b> <span id="f1score">-</span></p>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ================= DARK MODE ================= */
+function toggleDarkMode(){
+    document.body.classList.toggle("dark");
+}
+
+/* ================= IMAGE PREVIEW ================= */
+document.getElementById("imageInput").addEventListener("change", function(e){
+    const reader = new FileReader();
+    reader.onload = function(){
+        document.getElementById("selectedImage").src = reader.result;
+    }
+    reader.readAsDataURL(e.target.files[0]);
+});
+
+/* ================= PREDICTION ================= */
+function predict(modelName){
+
+    let fileInput = document.getElementById("imageInput");
+
+    if(fileInput.files.length === 0){
+        alert("Please upload an image first!");
+        return;
+    }
+
+    let selectedClass = document.getElementById("classSelect").value;
+
+    let formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+    formData.append("model", modelName);
+    formData.append("selected_class", selectedClass);
+
+    fetch("/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("predClass").innerText = data.predicted_class;
+        document.getElementById("selClass").innerText = data.selected_class;
+        document.getElementById("confidence").innerText = data.confidence + "%";
+        document.getElementById("modelUsed").innerText = data.model_used;
+
+        document.getElementById("accuracy").innerText = data.accuracy;
+        document.getElementById("precision").innerText = data.precision;
+        document.getElementById("recall").innerText = data.recall;
+        document.getElementById("f1score").innerText = data.f1_score;
+
+        document.getElementById("predictedImage").src = data.image_path;
+
+        /* ===== FULL NUTRITION DISPLAY ===== */
+        if(data.nutrition){
+            document.getElementById("nutritionData").innerHTML =
+                "<b>Calories:</b> " + data.nutrition.calories + " kcal<br>" +
+                "<b>Protein:</b> " + data.nutrition.protein_g + " g<br>" +
+                "<b>Carbs:</b> " + data.nutrition.carbs_g + " g<br>" +
+                "<b>Fat:</b> " + data.nutrition.fat_g + " g<br>" +
+                "<b>Fiber:</b> " + data.nutrition.fiber_g + " g<br>" +
+                "<b>Sugar:</b> " + data.nutrition.sugar_g + " g<br>" +
+                "<b>Sodium:</b> " + data.nutrition.sodium_mg + " mg<br>" +
+                "<b>Saturated Fat:</b> " + data.nutrition.sat_fat_g + " g<br>" +
+                "<b>Cholesterol:</b> " + data.nutrition.cholesterol_mg + " mg";
+        }
+
+    });
+}
+
+</script>
+
+</body>
+</html>

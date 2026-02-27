@@ -1,0 +1,67 @@
+import json
+import os
+import redis
+
+from log_code import setup_logging
+logger = setup_logging('food_item')
+
+class Nutritional_fact:
+  def food_item(self,host='localhost', port=6379):
+    try:
+
+      self.redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+      data = {
+        "food_items": [
+          { "name": "apple_pie", "calories": 237, "protein_g": 2.4, "carbs_g": 34, "fat_g": 11, "fiber_g": 2.1, "sugar_g": 18, "sodium_mg": 310, "sat_fat_g": 3.2, "cholesterol_mg": 0 },
+          { "name": "baked_potato", "calories": 161, "protein_g": 4.3, "carbs_g": 37, "fat_g": 0.2, "fiber_g": 3.8, "sugar_g": 2, "sodium_mg": 12, "sat_fat_g": 0.1, "cholesterol_mg": 0 },
+          { "name": "burger", "calories": 354, "protein_g": 17, "carbs_g": 29, "fat_g": 18, "fiber_g": 2.0, "sugar_g": 5, "sodium_mg": 640, "sat_fat_g": 6.0, "cholesterol_mg": 45 },
+          { "name": "butter_naan", "calories": 310, "protein_g": 9, "carbs_g": 45, "fat_g": 10, "fiber_g": 2.2, "sugar_g": 3, "sodium_mg": 450, "sat_fat_g": 6.0, "cholesterol_mg": 25 },
+          { "name": "chai", "calories": 60, "protein_g": 2, "carbs_g": 8, "fat_g": 2, "fiber_g": 0, "sugar_g": 7, "sodium_mg": 30, "sat_fat_g": 1.2, "cholesterol_mg": 8 },
+          { "name": "chapati", "calories": 71, "protein_g": 3, "carbs_g": 15, "fat_g": 0.4, "fiber_g": 2.0, "sugar_g": 0.1, "sodium_mg": 1, "sat_fat_g": 0.1, "cholesterol_mg": 0 },
+          { "name": "cheesecake", "calories": 257, "protein_g": 4.4, "carbs_g": 20, "fat_g": 18, "fiber_g": 0.4, "sugar_g": 17, "sodium_mg": 210, "sat_fat_g": 10.0, "cholesterol_mg": 55 },
+          { "name": "chicken_curry", "calories": 243, "protein_g": 25, "carbs_g": 8, "fat_g": 12, "fiber_g": 1.5, "sugar_g": 2, "sodium_mg": 680, "sat_fat_g": 3.5, "cholesterol_mg": 85 },
+          { "name": "chole_bhature", "calories": 427, "protein_g": 12, "carbs_g": 55, "fat_g": 18, "fiber_g": 7.0, "sugar_g": 4, "sodium_mg": 850, "sat_fat_g": 4.5, "cholesterol_mg": 10 },
+          { "name": "crispy_chicken", "calories": 290, "protein_g": 19, "carbs_g": 12, "fat_g": 18, "fiber_g": 0.5, "sugar_g": 0.2, "sodium_mg": 550, "sat_fat_g": 4.0, "cholesterol_mg": 70 },
+          { "name": "dal_makhani", "calories": 330, "protein_g": 12, "carbs_g": 38, "fat_g": 15, "fiber_g": 8.5, "sugar_g": 3, "sodium_mg": 620, "sat_fat_g": 8.0, "cholesterol_mg": 35 },
+          { "name": "dhokla", "calories": 160, "protein_g": 6, "carbs_g": 22, "fat_g": 5, "fiber_g": 2.5, "sugar_g": 4, "sodium_mg": 380, "sat_fat_g": 0.8, "cholesterol_mg": 0 },
+          { "name": "donut", "calories": 195, "protein_g": 2.1, "carbs_g": 22, "fat_g": 11, "fiber_g": 0.8, "sugar_g": 11, "sodium_mg": 210, "sat_fat_g": 5.0, "cholesterol_mg": 15 },
+          { "name": "fried_rice", "calories": 163, "protein_g": 3.4, "carbs_g": 32, "fat_g": 2.5, "fiber_g": 1.2, "sugar_g": 0.5, "sodium_mg": 480, "sat_fat_g": 0.5, "cholesterol_mg": 0 },
+          { "name": "fries", "calories": 312, "protein_g": 3.4, "carbs_g": 41, "fat_g": 15, "fiber_g": 3.8, "sugar_g": 0.3, "sodium_mg": 210, "sat_fat_g": 2.3, "cholesterol_mg": 0 },
+          { "name": "hot_dog", "calories": 151, "protein_g": 5, "carbs_g": 2, "fat_g": 13, "fiber_g": 0, "sugar_g": 1, "sodium_mg": 480, "sat_fat_g": 5.0, "cholesterol_mg": 25 },
+          { "name": "ice_cream", "calories": 137, "protein_g": 2.3, "carbs_g": 15, "fat_g": 7, "fiber_g": 0.5, "sugar_g": 14, "sodium_mg": 50, "sat_fat_g": 4.5, "cholesterol_mg": 25 },
+          { "name": "idli", "calories": 58, "protein_g": 1.6, "carbs_g": 12, "fat_g": 0.1, "fiber_g": 0.8, "sugar_g": 0.2, "sodium_mg": 160, "sat_fat_g": 0, "cholesterol_mg": 0 },
+          { "name": "jalebi", "calories": 150, "protein_g": 1, "carbs_g": 35, "fat_g": 2, "fiber_g": 0.2, "sugar_g": 25, "sodium_mg": 15, "sat_fat_g": 0.5, "cholesterol_mg": 0 },
+          { "name": "kaathi_rolls", "calories": 260, "protein_g": 12, "carbs_g": 30, "fat_g": 10, "fiber_g": 2.5, "sugar_g": 2, "sodium_mg": 520, "sat_fat_g": 3.0, "cholesterol_mg": 30 },
+          { "name": "kadai_paneer", "calories": 250, "protein_g": 14, "carbs_g": 10, "fat_g": 18, "fiber_g": 2.0, "sugar_g": 3, "sodium_mg": 580, "sat_fat_g": 11.0, "cholesterol_mg": 40 },
+          { "name": "kulfi", "calories": 136, "protein_g": 3, "carbs_g": 18, "fat_g": 6, "fiber_g": 0.1, "sugar_g": 15, "sodium_mg": 45, "sat_fat_g": 3.8, "cholesterol_mg": 20 },
+          { "name": "masala_dosa", "calories": 320, "protein_g": 6, "carbs_g": 50, "fat_g": 10, "fiber_g": 4.0, "sugar_g": 1.5, "sodium_mg": 820, "sat_fat_g": 2.5, "cholesterol_mg": 0 },
+          { "name": "momos", "calories": 35, "protein_g": 2, "carbs_g": 5, "fat_g": 1, "fiber_g": 0.3, "sugar_g": 0.5, "sodium_mg": 120, "sat_fat_g": 0.3, "cholesterol_mg": 5 },
+          { "name": "omelette", "calories": 154, "protein_g": 11, "carbs_g": 0.6, "fat_g": 12, "fiber_g": 0, "sugar_g": 0.4, "sodium_mg": 160, "sat_fat_g": 3.5, "cholesterol_mg": 370 },
+          { "name": "paani_puri", "calories": 36, "protein_g": 1, "carbs_g": 6, "fat_g": 1, "fiber_g": 0.8, "sugar_g": 0.5, "sodium_mg": 150, "sat_fat_g": 0.2, "cholesterol_mg": 0 },
+          { "name": "pakoda", "calories": 75, "protein_g": 2, "carbs_g": 8, "fat_g": 4, "fiber_g": 1.2, "sugar_g": 0.5, "sodium_mg": 140, "sat_fat_g": 0.8, "cholesterol_mg": 0 },
+          { "name": "pav_bhaji", "calories": 400, "protein_g": 9, "carbs_g": 55, "fat_g": 16, "fiber_g": 6.0, "sugar_g": 6, "sodium_mg": 980, "sat_fat_g": 9.0, "cholesterol_mg": 30 },
+          { "name": "pizza", "calories": 266, "protein_g": 11, "carbs_g": 33, "fat_g": 10, "fiber_g": 2.3, "sugar_g": 3.6, "sodium_mg": 640, "sat_fat_g": 4.5, "cholesterol_mg": 18 },
+          { "name": "samosa", "calories": 262, "protein_g": 3.5, "carbs_g": 24, "fat_g": 17, "fiber_g": 2.1, "sugar_g": 1.5, "sodium_mg": 420, "sat_fat_g": 3.5, "cholesterol_mg": 0 },
+          { "name": "sandwich", "calories": 250, "protein_g": 10, "carbs_g": 30, "fat_g": 8, "fiber_g": 3.0, "sugar_g": 4, "sodium_mg": 580, "sat_fat_g": 2.0, "cholesterol_mg": 15 },
+          { "name": "sushi", "calories": 37, "protein_g": 1.5, "carbs_g": 7, "fat_g": 0.1, "fiber_g": 0.2, "sugar_g": 0.5, "sodium_mg": 110, "sat_fat_g": 0, "cholesterol_mg": 4 },
+          { "name": "taco", "calories": 156, "protein_g": 8, "carbs_g": 12, "fat_g": 9, "fiber_g": 2.5, "sugar_g": 1, "sodium_mg": 310, "sat_fat_g": 3.8, "cholesterol_mg": 20 },
+          { "name": "taquito", "calories": 110, "protein_g": 4, "carbs_g": 13, "fat_g": 5, "fiber_g": 1.0, "sugar_g": 0.5, "sodium_mg": 240, "sat_fat_g": 1.5, "cholesterol_mg": 10 }
+        ]
+      }
+
+      with open('food_item.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
+      for food, values in data.items():
+        self.redis_client.set(food,json.dumps(values))
+
+      logger.info("File saved as food_item.json")
+      logger.info("Data stored in Redis successfully")
+
+    except redis.exceptions.ConnectionError:
+      logger.info("Redis server is not running. Please start Redis.")
+
+    except Exception as e:
+      logger.info("Error occurred:", e)
+

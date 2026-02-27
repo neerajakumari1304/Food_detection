@@ -22,6 +22,7 @@ This project is a comprehensive Deep Learning system designed to identify variou
 
 ## 📁 Project Structure
 Food_detection/
+
 ├── app.py                # Main Flask application (Web UI & Inference)
 
 ├── main.py               # Central execution script (Data init + Training)

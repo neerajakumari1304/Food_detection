@@ -84,4 +84,4 @@ vgg16_results.json
 ## 📝 Logging
 All operations (data splitting, training progress, Redis connections) are logged in the logs/ directory. If you encounter issues, check the specific .log file corresponding to the script name.
 
-![image.png](assets/image.png)
+
